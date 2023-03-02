@@ -13,6 +13,7 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
+from django.utils.html import format_html
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import get_template
@@ -611,8 +612,11 @@ class DeviceAdmin(MultitenantAdminMixin, BaseConfigAdmin, UUIDAdmin):
         return fields
 
     def ip(self, obj):
-        mngmt_ip = obj.management_ip if app_settings.MANAGEMENT_IP_DEVICE_LIST else None
-        return mngmt_ip or obj.last_ip
+        mngmt_ip = obj.management_ip if app_settings.MANAGEMENT_IP_DEVICE_LIST else "-"
+        if mngmt_ip:
+            return format_html('<a href="http://{}" target="_blank" style="color:red; font-weight:bold; text-decoration:underline;">{}</a>', mngmt_ip, mngmt_ip)
+        else:
+            return obj.last_ip
 
     ip.short_description = _('IP address')
 
